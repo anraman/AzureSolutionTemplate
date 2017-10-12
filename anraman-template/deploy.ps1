@@ -25,7 +25,7 @@
 #>
 
 param(
- [Parameter]#(Mandatory=$True)]
+ [Parameter(Mandatory=$True)]
  [string]
  $subscriptionId, 
 
@@ -54,12 +54,12 @@ param(
 $ErrorActionPreference = "Stop"
 
 # sign in
-#Write-Host "Logging in...";
-#Login-AzureRmAccount;
+Write-Host "Logging in...";
+Login-AzureRmAccount;
 
 # select subscription
-#Write-Host "Selecting subscription '$subscriptionId'";
-#Select-AzureRmSubscription -SubscriptionID $subscriptionId;
+Write-Host "Selecting subscription '$subscriptionId'";
+Select-AzureRmSubscription -SubscriptionID $subscriptionId;
 
 #Create or check for existing resource group
 $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
