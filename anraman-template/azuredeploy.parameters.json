@@ -3,19 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "cosmosDBName": {
-            "value":"loriotcosmosdbanraman"
-        },
-        "sqlAdministratorLogin": {
-            "value":"loriotsqladmin"
-        },
-        "sqlDBName": {
-            "value":"loriotsqldbanraman"
+            "value":"loriotcosmosdb"
         },
         "eventHubName": {
-            "value":"loriotehanraman"
+            "value":"lorioteh"
         },
         "streamAnalyticsJobName": {
-            "value":"loriotsaanraman" 
+            "value":"loriotsa" 
         },
         "pbiDatasetName": { 
             "value":"loriotlivedataset"

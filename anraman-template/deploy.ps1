@@ -25,7 +25,7 @@
 #>
 
 param(
- [Parameter(Mandatory=$True)]
+ [Parameter (Mandatory=$True)]
  [string]
  $subscriptionId, 
 

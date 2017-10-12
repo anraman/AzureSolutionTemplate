@@ -9,25 +9,6 @@
         },
         "defaultValue": "loriotcosmosdb"
       },
-      "sqlAdministratorLogin": {
-        "type": "string",
-        "metadata": {
-          "description": "The admin user of the SQL Server"
-        }
-      },
-      "sqlAdministratorLoginPassword": {
-        "type": "securestring",
-        "metadata": {
-          "description": "The password of the admin user of the SQL Server"
-        }
-      },
-      "sqlDBName": {
-        "type": "string",
-        "metadata": {
-          "description": "The name for the SQL DB"
-        },
-        "defaultValue": "loriotsqldb"
-      },
       "eventHubName": {
         "type": "string",
         "metadata": {
@@ -72,7 +53,6 @@
     },
     "variables": {
       "offerType": "Standard",
-      "sqlserverName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
       "timeSeriesConsumerGroupName":"loriottimeseries",
       "messageConsumerGroupName": "loriotmessageprocessing",
       "ehAuthRuleName": "streamanalyticsauthrule",
@@ -94,53 +74,6 @@
             }
           ]
         }
-      },
-      {
-        "name": "[variables('sqlserverName')]",
-        "type": "Microsoft.Sql/servers",
-        "location": "[resourceGroup().location]",
-        "tags": {
-          "displayName": "SqlServer"
-        },
-        "apiVersion": "2014-04-01",
-        "properties": {
-          "administratorLogin": "[parameters('sqlAdministratorLogin')]",
-          "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-          "version": "12.0"
-        },
-        "resources": [
-          {
-            "name": "[parameters('sqlDBName')]",
-            "type": "databases",
-            "location": "[resourceGroup().location]",
-            "tags": {
-              "displayName": "Database"
-            },
-            "apiVersion": "2015-01-01",
-            "dependsOn": [
-              "[variables('sqlserverName')]"
-            ],
-            "properties": {
-              "edition": "Basic",
-              "collation": "SQL_Latin1_General_CP1_CI_AS",
-              "maxSizeBytes": "1073741824",
-              "requestedServiceObjectiveName": "Basic"
-            }
-          },
-          {
-            "type": "firewallrules",
-            "apiVersion": "2014-04-01",
-            "dependsOn": [
-              "[variables('sqlserverName')]"
-            ],
-            "location": "[resourceGroup().location]",
-            "name": "AllowAllWindowsAzureIps",
-            "properties": {
-              "endIpAddress": "0.0.0.0",
-              "startIpAddress": "0.0.0.0"
-            }
-          }
-        ]
       },
       {  
         "apiVersion":"2017-04-01",
@@ -212,7 +145,8 @@
         "location": "[resourceGroup().location]",
         "type": "Microsoft.StreamAnalytics/StreamingJobs",
         "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('ehNamespaceName'), parameters('eventHubName'))]"
+          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('ehNamespaceName'), parameters('eventHubName'))]",
+          "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDBName'))]"
         ],
         "properties": {
           "sku": {
@@ -231,7 +165,7 @@
                    "serialization":{    
                       "type":"JSON",  
                       "properties":{    
-                         "encoding":"UTF8"  
+                         "encoding":"UTF8"
                       }  
                    },  
                    "datasource":{    
@@ -240,7 +174,8 @@
                          "serviceBusNamespace":"[variables('ehNamespaceName')]",  
                          "sharedAccessPolicyName":"SampleReceiver",  
                          "sharedAccessPolicyKey":"[listkeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('ehNamespaceName'), parameters('eventHubName'), variables('ehAuthRuleName')), '2014-09-01').primaryKey]",  
-                         "eventHubName":"[parameters('eventHubName')]"  
+                         "eventHubName":"[parameters('eventHubName')]",
+                         "consumerGroup":"[variables('messageConsumerGroupName')]"  
                       }  
                    }  
                 }  
@@ -276,6 +211,25 @@
                     "refreshToken": "dummytoken",
                     "tokenUserDisplayName": "[parameters('pbiUserDisplayName')]",
                     "tokenUserPrincipalName": "[parameters('pbiUserLoginName')]"
+                  }
+                },
+                "serialization": null,
+                "diagnostics": null
+              }
+            },
+            {
+              "name": "loriotCosmosDB",
+              "properties": {
+                "dataSource": {
+                  "type": "Microsoft.Storage/DocumentDB",
+                  "properties": {
+                    "type": "Microsoft.Storage/DocumentDB",
+                    "accountId": "[parameters('cosmosDBName')]",
+                    "accountKey": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('cosmosDBName')), '2015-04-08').primaryMasterKey]",                    
+                    "database": "db",
+                    "collectionNamePattern": ".coll",
+                    "partitionKey": "/deviceId",
+                    "documentId": "[parameters('pbiUserDisplayName')]"
                   }
                 },
                 "serialization": null,
