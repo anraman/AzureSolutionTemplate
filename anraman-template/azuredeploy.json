@@ -239,7 +239,7 @@
                       "properties":{    
                          "serviceBusNamespace":"[variables('ehNamespaceName')]",  
                          "sharedAccessPolicyName":"SampleReceiver",  
-                         "sharedAccessPolicyKey":"[listkeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('ehNamespaceName'), parameters('eventHubName'), variables('ehAuthRuleName')), '2014-09-01')]",  
+                         "sharedAccessPolicyKey":"[listkeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('ehNamespaceName'), parameters('eventHubName'), variables('ehAuthRuleName')), '2014-09-01').primaryKey]",  
                          "eventHubName":"[parameters('eventHubName')]"  
                       }  
                    }  
