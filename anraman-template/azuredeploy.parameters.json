@@ -14,9 +14,6 @@
         "eventHubName": {
             "value":"loriotehanraman"
         },
-        "ehNamespaceName": {
-            "value":"loriotehnsanraman"
-        },
         "streamAnalyticsJobName": {
             "value":"loriotsaanraman" 
         },
